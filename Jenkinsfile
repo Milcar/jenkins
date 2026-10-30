@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        PYTHON = 'C:\\Users\\lumad\\AppData\\Local\\Programs\\Python\\Python314\\python.exe'
+    }
+
     stages {
         stage('Install dependencies') {
             steps {
@@ -13,9 +17,9 @@ pipeline {
                         '''
                     } else {
                         bat '''
-                            py -3 -c "from pathlib import Path; import shutil; [shutil.rmtree(p) for p in ('reports/unittest', 'reports/behave') if Path(p).exists()]"
-                            py -3 -m pip install -r requirements.txt
-                            py -3 -c "from pathlib import Path; [Path(p).mkdir(parents=True, exist_ok=True) for p in ('reports/unittest', 'reports/behave')]"
+                            "%PYTHON%" -c "from pathlib import Path; import shutil; [shutil.rmtree(p) for p in ('reports/unittest', 'reports/behave') if Path(p).exists()]"
+                            "%PYTHON%" -m pip install -r requirements.txt
+                            "%PYTHON%" -c "from pathlib import Path; [Path(p).mkdir(parents=True, exist_ok=True) for p in ('reports/unittest', 'reports/behave')]"
                         '''
                     }
                 }
@@ -29,7 +33,7 @@ pipeline {
                         if (isUnix()) {
                             sh 'python3 -m xmlrunner discover -s tests -o reports/unittest'
                         } else {
-                            bat 'py -3 -m xmlrunner discover -s tests -o reports/unittest'
+                            bat '"%PYTHON%" -m xmlrunner discover -s tests -o reports/unittest'
                         }
                     }
                 }
@@ -43,7 +47,7 @@ pipeline {
                         if (isUnix()) {
                             sh 'python3 -m behave features --junit --junit-directory reports/behave'
                         } else {
-                            bat 'py -3 -m behave features --junit --junit-directory reports/behave'
+                            bat '"%PYTHON%" -m behave features --junit --junit-directory reports/behave'
                         }
                     }
                 }
